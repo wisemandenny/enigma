@@ -14,16 +14,26 @@ const useStyles = makeStyles((theme) => ({
 
 const alphabet = [...'abcdefghijklmnopqrstuvwxyz']
 
+const shiftRight = (str, leftShifts, rightShifts) => shiftByAmount(shiftByAmount(str, leftShifts), -rightShifts)
+// helper function
+// negative amount shifts to right
+// positive amount shifts to left
+const shiftByAmount = (str, leftShifts) => {
+   leftShifts = leftShifts % str.length;
+   return str.slice(leftShifts) + str.slice(0, leftShifts);
+};
+
 const Rotor = (props) => {
   const classes = useStyles()
-  const { position, mapping } = props
+  const { position, mapping, turnover } = props
+  const shiftedMapping = shiftRight(mapping, 0, position)
 
   return (
     <div className={classes.root}>
       <List component='nav' dense > 
       {alphabet.map((letter, index) => (
-        <ListItem selected={index===position}>
-            <ListItemText primary={letter.toUpperCase() + "->" + [...mapping][index].toUpperCase()} />
+        <ListItem selected={index===turnover}>
+            <ListItemText primary={letter.toUpperCase() + "->" + [...shiftedMapping][index].toUpperCase()} />
           </ListItem>
       ))}
       </List>

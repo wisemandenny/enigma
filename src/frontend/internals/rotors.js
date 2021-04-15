@@ -43,7 +43,7 @@ const rotate = (position) => {
 
 const Rotors = (props) => {
   const classes = useStyles()
-  const {pressedKey, rotorPositions, setRotorPositions, types} = props
+  const {pressedKey, rotorPositions, setRotorPositions, setRotorOutputKey, types} = props
 
 
   React.useEffect(() => {
@@ -61,9 +61,9 @@ const Rotors = (props) => {
   
   return (
     <div className={classes.root}>
-      <Rotor position={rotorPositions[0]} slot={2} mapping={RotorSettings[types[2]].mapping}/>
-      <Rotor position={rotorPositions[1]} slot={1} mapping={RotorSettings[types[1]].mapping}/>
-      <Rotor position={rotorPositions[2]} slot={0} mapping={RotorSettings[types[0]].mapping}/>
+      <Rotor position={rotorPositions[0]} slot={2} mapping={RotorSettings[types[2]].mapping} turnover={RotorSettings[types[2]].turnoverPosition}/>
+      <Rotor position={rotorPositions[1]} slot={1} mapping={RotorSettings[types[1]].mapping} turnover={RotorSettings[types[1]].turnoverPosition}/>
+      <Rotor position={rotorPositions[2]} slot={0} mapping={RotorSettings[types[0]].mapping} turnover={RotorSettings[types[0]].turnoverPosition}/>
     </div>
   )
 }
