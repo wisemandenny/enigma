@@ -16,9 +16,9 @@ const useStyles = makeStyles ((theme) => ({
 
 const Keyboard = (props) => {
   const classes = useStyles()
-  const {setPressedKey} = props
+  const {dupKeyToggle, setPressedKey} = props
 
-  const onClick = (key) => setPressedKey(key)
+  const onClick = (key) => setPressedKey([key, !dupKeyToggle])
 
   return (
     <div className={classes.root}>
