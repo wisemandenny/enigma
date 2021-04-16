@@ -6,6 +6,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 
 const useStyles = makeStyles((theme) => ({
   root: {
+    display: 'flex',
+    flexDirection: 'row',
     width: '100%',
     maxWidth: 360,
     backgroundColor: theme.palette.background.paper,
@@ -14,28 +16,27 @@ const useStyles = makeStyles((theme) => ({
 
 const alphabet = [...'abcdefghijklmnopqrstuvwxyz']
 
-const shiftRight = (str, leftShifts, rightShifts) => shiftByAmount(shiftByAmount(str, leftShifts), -rightShifts)
-// helper function
-// negative amount shifts to right
-// positive amount shifts to left
-const shiftByAmount = (str, leftShifts) => {
-   leftShifts = leftShifts % str.length;
-   return str.slice(leftShifts) + str.slice(0, leftShifts);
-};
-
 const Rotor = (props) => {
   const classes = useStyles()
-  const { position, mapping, turnover } = props
-  const shiftedMapping = shiftRight(mapping, 0, position)
-
+  const { slot, position, mapping, turnover, input, setOutput } = props
+  React.useEffect(() => {
+    setOutput([[...mapping][alphabet.indexOf(input[0])], !input[1]])
+  }, [input, mapping])
   return (
     <div className={classes.root}>
       <List component='nav' dense > 
       {alphabet.map((letter, index) => (
-        <ListItem selected={index===turnover}>
-            <ListItemText primary={letter.toUpperCase() + "->" + [...shiftedMapping][index].toUpperCase()} />
+        <ListItem selected={letter===input[0]} divider={index===turnover}>
+            <ListItemText primary={letter.toUpperCase()}/>
           </ListItem>
       ))}
+      </List>
+      <List component='nav' dense>
+        {alphabet.map((letter, index) => (
+          <ListItem selected={letter===input[0]} divider={index===turnover}>
+            <ListItemText primary={[...mapping][index].toUpperCase()} />
+          </ListItem>
+        ))}
       </List>
     </div>
   )

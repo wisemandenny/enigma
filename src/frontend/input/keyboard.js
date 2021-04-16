@@ -18,7 +18,10 @@ const Keyboard = (props) => {
   const classes = useStyles()
   const {dupKeyToggle, setPressedKey} = props
 
-  const onClick = (key) => setPressedKey([key, !dupKeyToggle])
+  const onClick = (key) => {
+    console.log("pressed ", key)
+    setPressedKey([key, !dupKeyToggle])
+  }
 
   return (
     <div className={classes.root}>
