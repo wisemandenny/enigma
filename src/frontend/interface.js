@@ -1,5 +1,6 @@
 import React from 'react'
 import Keyboard from './input/keyboard.js'
+import RotorInit from './input/rotorInit.js'
 import LampBoard from './output/lampboard.js'
 import Rotors from './internals/rotors.js'
 
@@ -14,6 +15,7 @@ export default function Interface() {
       <LampBoard litLamp={rotorOutputKey ? rotorOutputKey[0] : ''}/>
       <Rotors pressedKey={pressedKey} rotorPositions={rotorPositions} setRotorPositions={setRotorPositions} types={['I', 'II', 'III']} setRotorOutputKey={setRotorOutputKey}/>
       <Keyboard setPressedKey={setPressedKey} dupKeyToggle={pressedKey[1]}/>
+      <RotorInit rotorPositions={rotorPositions} setRotorPositions={setRotorPositions}/>
       <p>{pressedKey}</p>
     </div>
   )

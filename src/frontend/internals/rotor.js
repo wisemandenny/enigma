@@ -18,7 +18,7 @@ const alphabet = [...'abcdefghijklmnopqrstuvwxyz']
 
 const Rotor = (props) => {
   const classes = useStyles()
-  const { slot, position, mapping, turnover, input, setOutput } = props
+  const { mapping, turnover, input, setOutput } = props
   React.useEffect(() => {
     setOutput([[...mapping][alphabet.indexOf(input[0])], !input[1]])
   }, [input, mapping])

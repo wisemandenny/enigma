@@ -55,13 +55,14 @@ const Rotors = (props) => {
 
 
   React.useEffect(() => {
+    if (pressedKey[0] === '!') return
     let newPositions = [...rotorPositions]
-    newPositions[2] = rotate(newPositions[2])
-    if (newPositions[2] === RotorSettings[types[2]].turnoverPosition) {
+    newPositions[0] = rotate(newPositions[0])
+    if (newPositions[0] === RotorSettings[types[0]].turnoverPosition) {
       newPositions[1] = rotate(newPositions[1])
     }
     if (newPositions[1] === RotorSettings[types[1]].turnoverPosition) {
-      newPositions[0] = rotate(newPositions[0])
+      newPositions[2] = rotate(newPositions[2])
     }
     setRotorPositions(newPositions)
   }, [pressedKey])
@@ -69,9 +70,9 @@ const Rotors = (props) => {
   
   return (
     <div className={classes.root}>
-      <Rotor slot={0} mapping={shiftRight(RotorSettings[types[0]].mapping, 0, rotorPositions[2])} turnover={RotorSettings[types[0]].turnoverPosition} input={pressedKey} setOutput={setRotorOutput0}/>
-      <Rotor slot={1} mapping={shiftRight(RotorSettings[types[1]].mapping, 0, rotorPositions[1])} turnover={RotorSettings[types[1]].turnoverPosition} input={rotorOutput0} setOutput={setRotorOutput1}/>
-      <Rotor slot={2} mapping={shiftRight(RotorSettings[types[2]].mapping, 0, rotorPositions[0])} turnover={RotorSettings[types[2]].turnoverPosition} input={rotorOutput1} setOutput={setRotorOutputKey}/>
+      <Rotor mapping={shiftRight(RotorSettings[types[0]].mapping, 0, rotorPositions[0])} turnover={RotorSettings[types[0]].turnoverPosition} input={pressedKey} setOutput={setRotorOutput0}/>
+      <Rotor mapping={shiftRight(RotorSettings[types[1]].mapping, 0, rotorPositions[1])} turnover={RotorSettings[types[1]].turnoverPosition} input={rotorOutput0} setOutput={setRotorOutput1}/>
+      <Rotor mapping={shiftRight(RotorSettings[types[2]].mapping, 0, rotorPositions[2])} turnover={RotorSettings[types[2]].turnoverPosition} input={rotorOutput1} setOutput={setRotorOutputKey}/>
     </div>
   )
 }
