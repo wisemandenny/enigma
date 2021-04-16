@@ -18,7 +18,7 @@ app.use(session({
 }))
 
 app.use(bodyParser.json())
-app.unsubscribe(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: true }))
 
 const alphabet = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ']
 const RotorSettings = {
@@ -105,7 +105,6 @@ const inverseTransform = (char, mapping, rotation) => {
 
 const encodeSingle = (rotors, inputChar) => {
   const rotatedRotors = rotateAll(rotors)
-  // console.log(rotatedRotors)
   const outR0 = transform(inputChar, rotatedRotors[0].mapping, rotatedRotors[0].position)
   const outR1 = transform(outR0, rotatedRotors[1].mapping, rotatedRotors[1].position)
   const outR2 = transform(outR1, rotatedRotors[2].mapping, rotatedRotors[2].position)
@@ -113,9 +112,6 @@ const encodeSingle = (rotors, inputChar) => {
   const inR2 = inverseTransform(outReflector, rotatedRotors[2].mapping, rotatedRotors[2].position)
   const inR1 = inverseTransform(inR2, rotatedRotors[1].mapping, rotatedRotors[1].position)
   const outputChar = inverseTransform(inR1, rotatedRotors[0].mapping, rotatedRotors[0].position)
-  if (!outputChar) {
-    console.log("outR0", outR0, "outR1", outR1, "outR2", outR2, "outReflector", outReflector, "inR2", inR2, "inR1", inR1, "outputChar", outputChar)
-  }
   return {rotatedRotors, outputChar}
 
 }
@@ -135,16 +131,13 @@ app.post('/enigma/encode/single', (req, res) => {
 app.post('/enigma/encode/string', (req, res) => {
   const { input } = req.body
   let rotors = setupRotors(req.body.rotors);
-  let outputString = ""
-  console.log(input);
+  let outputString = "";
 
   [...input].forEach((char) => {
     const {rotatedRotors, outputChar } = encodeSingle(rotors, char)
     rotors = rotatedRotors
-    if (!outputChar) console.log(char)
     outputString += outputChar
   })
-  console.log("done")
   res.send({rotors, outputString})
 })
 

@@ -1,0 +1,12 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.lamps {
+  justify-self: center;
+  align-self: center;
+}
+

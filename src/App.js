@@ -1,10 +1,10 @@
 import './App.css';
-import Interface from './frontend/interface.js'
+import EnigmaSim from './frontend/new/EnigmaSim.js'
 
 function App() {
   return (
     <div className="App">
-        <Interface />
+      <EnigmaSim />
     </div>
   );
 }
