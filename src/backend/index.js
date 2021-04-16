@@ -53,8 +53,11 @@ const Reflector = {
   mapping: 'YRUHQSLDPXNGOKMIEBFZCWVJAT'
 }
 
-const alphaToIndex = (char) => [...alphabet].indexOf(char)
+
+const alphaToIndex = (char) => alphabet.indexOf(char)
 const indexToAlpha = (index) => alphabet[index]
+const numeralToIndex = (romanNumeral) => ['I', 'II', 'III', 'IV', 'V'].indexOf(romanNumeral)
+const indexToNumeral = (index) => ['I', 'II', 'III', 'IV', 'V'][index]
 
 const shiftRight = (str, leftShifts, rightShifts) => shiftByAmount(shiftByAmount(str, leftShifts), -rightShifts)
 const shiftByAmount = (str, leftShifts) => {
@@ -100,7 +103,7 @@ const transform = (char, mapping, rotation=0) => {
 
 const inverseTransform = (char, mapping, rotation) => {
   const idx = [...shiftRight(mapping, 0, rotation)].indexOf(char)
-  return [...alphabet][idx]
+  return alphabet[idx]
 }
 
 const encodeSingle = (rotors, inputChar) => {
@@ -116,10 +119,101 @@ const encodeSingle = (rotors, inputChar) => {
 
 }
 
+const indexOfCoincidence = (ciphertext) => {
+  const N = ciphertext.length
+  const c = 26
+  const sums = alphabet.map((letter) => ([...ciphertext]).filter((cipherLetter) => cipherLetter === letter).length)
+
+  const result = sums.reduce((acc, curr) => acc + ((curr / N) * (curr - 1) / (N-1)), 0)
+  return result
+}
+
+const findMaxIOC = (ciphertext) => {
+  // let top3 = new Array()
+  const rotors = RotorSettings
+  rotors['I'].position = 0;
+  rotors['II'].position = 0;
+  rotors['III'].position = 0;
+  rotors['IV'].position = 0;
+  rotors['V'].position = 0;
+  rotors['I'].type = 'I';
+  rotors['II'].type = 'II';
+  rotors['III'].type = 'III';
+  rotors['IV'].type = 'IV';
+  rotors['V'].type = 'V';
+  
+  for (let i = 0; i < 5; i++) {
+    for (let j = 0; j < 5; j++) {
+      for (let k = 0; k < 5; k++) {
+        if (i === j || i === k || j === k) continue
+        const _i = indexToNumeral(i)
+        const _j = indexToNumeral(j)
+        const _k = indexToNumeral(k)
+        const rotor0 = rotors[_i]
+        const rotor1 = rotors[_j]
+        const rotor2 = rotors[_k]
+        let max = 0
+        const maxSettings = {}
+        // try each starting position
+        for (let l = 0; l < 26; l++) {
+          for (let m = 0; m < 26; m++) {
+            for (let n = 0; n < 26; n++) {
+              rotor0.position = n
+              rotor1.position = m
+              rotor2.position = l
+              const encoded = encodeString(ciphertext, [rotor0, rotor1, rotor2])
+              const encodedIOC = indexOfCoincidence(encoded.outputString)
+              if (encodedIOC > max) {
+                max = encodedIOC
+                maxSettings.rotor0pos = n
+                maxSettings.rotor1pos = m
+                maxSettings.rotor2pos = l
+              }
+              // console.log('rotor0:', rotor0.type, rotor0.position, 'rotor1:', rotor1.type, rotor1.position, 'rotor2', rotor2.type, rotor2.position)
+            }
+          }
+        }
+        console.log(_i, _j, _k, JSON.stringify(maxSettings), max)
+        
+      }
+    }
+  }
+  return top3
+}
+
+const encodeString = (input, rotorSettings) => {
+  let outputString = "";
+  let rotors = setupRotors(rotorSettings);
+
+  [...input].forEach((char) => {
+    const {rotatedRotors, outputChar } = encodeSingle(rotors, char)
+    rotors = rotatedRotors
+    outputString += outputChar
+  })
+
+  return {rotors, outputString}
+}
+
+
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')))
 
 /* =========== ROUTES =========== */
+app.post('/enigma/crack/ioc', (req, res) => {
+  const { ciphertext } = req.body
+  console.log("Cracking", ciphertext)
+  const top3 = findMaxIOC(ciphertext)
+  res.status(200).send(top3)
+
+})
+
+app.post('/enigma/crack/single_ioc', (req, res) => {
+  const { ciphertext } = req.body
+  const ioc = indexOfCoincidence(ciphertext)
+  res.status(200).send({ioc})
+
+})
+
 app.post('/enigma/encode/single', (req, res) => {
   // rotors: [ {type: 'V', position: 2},  {type: 'I', position: 4}, {type: 'II', position: 12}]
   // input: 'A'
@@ -129,16 +223,14 @@ app.post('/enigma/encode/single', (req, res) => {
 })
 
 app.post('/enigma/encode/string', (req, res) => {
-  const { input } = req.body
-  let rotors = setupRotors(req.body.rotors);
-  let outputString = "";
-
-  [...input].forEach((char) => {
-    const {rotatedRotors, outputChar } = encodeSingle(rotors, char)
-    rotors = rotatedRotors
-    outputString += outputChar
-  })
-  res.send({rotors, outputString})
+  const { input, rotors} = req.body
+  const encoded = encodeString(input, rotors)
+  
+  res.send({...encoded})
 })
 
 app.listen(port, () => console.log(`Listening on port ${port}...`))
+
+
+// ONTHEOTHERHANDWEDENOUNCEWITHRIGHTEOUSINDIGNATIONANDDISLIKEMENWHOARESOBEGUILEDANDDEMORALIZEDBYTHECHARMSOFPLEASUREOFTHEMOMENTSOBLINDEDBYDESIRETHATTHEYCANNOTFORESEETHEPAINANDTROUBLETHATAREBOUNDTOENSUEANDEQUALBLAMEBELONGSTOTHOSEWHOFAILINTHEIRDUTYTHROUGHWEAKNESSOFWILLWHICHISTHESAMEASSAYINGTHROUGHSHRINKINGFROMTOILANDPAINTHESECASESAREPERFECTLYSIMPLEANDEASYTODISTINGUISHINAFREEHOURWHENOURPOWEROFCHOICEISUNTRAMMELLEDANDWHENNOTHINGPREVENTSOURBEINGABLETODOWHATWELIKEBESTEVERYPLEASUREISTOBEWELCOMEDANDEVERYPAINAVOIDEDBUTINCERTAINCIRCUMSTANCESANDOWINGTOTHECLAIMSOFDUTYORTHEOBLIGATIONSOFBUSINESSITWILLFREQUENTLYOCCURTHATPLEASURESHAVETOBEREPUDIATEDANDANNOYANCESACCEPTEDTHEWISEMANTHEREFOREALWAYSHOLDSINTHESEMATTERSTOTHISPRINCIPLEOFSELECTIONHEREJECTSPLEASURESTOSECUREOTHERGREATERPLEASURESORELSEHEENDURESPAINSTOAVOIDWORSEPAINS (1:4 3:0 4:2)
+//ZUPENFXQNTZIQQYMHIUVDGQVFZMVZZZAXWCBUAQQUCFRWQAGXAUAKOCZYTAWEAZBLORFXZLKDMTVUDRWGHOFYTYXHXZMWQDIASOAZZBTXJXSDCYWCOKQXBXEPWWHAPTPVABWQFSTZLILKQLHKAPPARGGHCWWNRFHNEKWGWRGLWLQUGNDHVLFTFJEXKMCEMAFQGGLRHFKLIDRTYPDTRQHCFEVQRLVORPMKUXMOMTPVFYRWCSCXUAQIBWZANPRDZCKBKWOKJCPUVLQRJKQXJHEPRBHOLPAIFYEVQZAZQIXAZRWZSUGYCAMTNVAXPWLBANZNVNJXJHKPYLAMVQCPNLZKWCTMBKLNJFHXOBVWQGNDPEJKUJYVTNQCBIDOACDRAHVPVYKWPYSWRNVZYERIIVBRUSIKRGFFFSYRSPEFPPRILCXQHPDRASLTGENOSBMVMMSKTAAQURCRIPVWLYVYBLSBPFQVTBZAFXXUADGXTLBOGUVNVNQTSFPMGCXWXZMIQBWALJCXPVPKELQOWXTEVQJLWLDKEUKIHLFSPSPWDDFUMBRJBIHAMXZEQNRLPBYLSSKHWBBNJUAKNUUSQGLZJGAASHSLRHYXQTRGUXEPLUIBSOEGCBUBEXWHMBTALWIQQHWFGMRGTGZTPVRTGNMXQNARJXBHWGULACDHDSDSDJFDAQIKJRGKTRFPTCCIVYZAWMVWAWYBBOXGUXRBFPXLTIMHAYVNRAHLEZRYLNJWORFGGBLEJYVBFYRZTVTMANTGUXEPLUIBVJVTZSJBRUMHYNZGWRGGHXHMGVBPHYZSCJZUA
