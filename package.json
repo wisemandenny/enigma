@@ -21,7 +21,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "dev": "nodemon ./src/backend/index.js"
+    "dev": "NODE_ENV=production nodemon ./src/backend/index.js"
   },
   "eslintConfig": {
     "extends": [
