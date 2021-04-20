@@ -13,7 +13,7 @@ Index of coincidence mode is the most thoroughly tested, and the average crack t
 ## Future plans:
 * Deployment
 * Performance Enhancements
-* Add asynchronous [worker threads](https://nodejs.org/api/worker_threads.html) to process the cracking
+* Add asynchronous [worker threads](https://nodejs.org/api/worker_threads.html) to process the cracking, enabling more than one crack at the same time without rebooting the server 😅
 * Enable cancelling of cracks in progress
 * Implement the plugboard
 
