@@ -1,6 +1,5 @@
 import './App.css';
-// import EnigmaSim from './frontend/new/EnigmaSim.js'
-import EnigmaMachine from './frontend/main/index.js'
+import EnigmaMachine from './client/index.js'
 
 function App() {
   return (
