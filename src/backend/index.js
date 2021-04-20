@@ -1,25 +1,21 @@
 const express = require('express')
-const session = require('express-session')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const path = require('path')
-
 const port = 3001
 
 const app = express()
 
-app.use(session({
-  secret: 'mysecret', //TODO: change this
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    expires: 600000,
-  }
-}))
-
 app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
+
+const sanitizeInput = (req, res, next) => {
+  const input = req.body.input ? req.body.input : req.body.ciphertext
+  const trimmedInput = input.replace(/[\s\W\d]+/g, '').toUpperCase()
+  req.ciphertext = trimmedInput
+  next()
+}
 
 const alphabet = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ']
 const RotorSettings = {
@@ -157,9 +153,7 @@ const quadgrams = [
 
 const alphaToIndex = (char) => alphabet.indexOf(char)
 const indexToAlpha = (index) => alphabet[index]
-const numeralToIndex = (romanNumeral) => ['I', 'II', 'III', 'IV', 'V'].indexOf(romanNumeral)
 const indexToNumeral = (index) => ['I', 'II', 'III', 'IV', 'V'][index]
-
 
 /**
  * Given a character input [a-z] and a mapping (26 char string), return the encoded character
@@ -266,28 +260,15 @@ const indexOfCoincidence = {
     const N = ciphertext.length
     const c = 26
     const sums = alphabet.map((letter) => ([...ciphertext]).filter((cipherLetter) => cipherLetter === letter).length)
-
     const result = sums.reduce((acc, curr) => acc + ((curr / N) * (curr - 1) / (N-1)), 0)
     return result
   },
   minScore: 0.06,
-  maxScore: 0.065
+  maxScore: 0.068
 }
 
 const findMax = (ciphertext, scoringMethod) => {
-  let top3 = []
-  const buildTop3 = (current) => {
-    if (top3.length < 3) {
-      top3.push(current)
-    } 
-    else {
-      // sort in descending order by score
-      top3.sort((a, b) => a.score - b.score)
-      if (top3[2].score < current.score) {
-        top3[2] = current
-      }
-    }
-  }
+  const top3 = []
   const rotors = RotorSettings
   rotors['I'].position = 0;
   rotors['II'].position = 0;
@@ -299,7 +280,6 @@ const findMax = (ciphertext, scoringMethod) => {
   rotors['III'].type = 'III';
   rotors['IV'].type = 'IV';
   rotors['V'].type = 'V';
-  
   for (let i = 0; i < 5; i++) {
     for (let j = 0; j < 5; j++) {
       for (let k = 0; k < 5; k++) {
@@ -310,7 +290,7 @@ const findMax = (ciphertext, scoringMethod) => {
         const rotor0 = rotors[_i]
         const rotor1 = rotors[_j]
         const rotor2 = rotors[_k]
-        const maxSettings = {score: 0}
+        const max = {score: 0}
         // try each starting position for each rotor. 
         rotor2:
         for (let l = 0; l < 26; l++) {
@@ -322,42 +302,41 @@ const findMax = (ciphertext, scoringMethod) => {
               const encoded = encodeString(ciphertext, [rotor0, rotor1, rotor2])
               const encodedScore = scoringMethod.method(encoded.outputString)
               // record the new highest score configuration
-              if (encodedScore > maxSettings.score) {
-                maxSettings.rotors = [
-                  {
-                    type: rotor0.type,
-                    pos: n
-                  },
-                  {
-                    type: rotor1.type,
-                    pos: m
-                  },
-                  {
-                    type: rotor2.type,
-                    pos: l
-                  }
+              if (encodedScore > max.score) {
+                max.rotors = [
+                  { type: rotor0.type, pos: n },
+                  { type: rotor1.type, pos: m },
+                  { type: rotor2.type, pos: l }
                 ]
-                maxSettings.decoded = encoded.outputString
-                maxSettings.score = encodedScore
+                max.decoded = encoded.outputString
+                max.score = encodedScore
               }
             }
           }
           // if this is not a promising configuration, skip to the next rotor set permutation
-          if (maxSettings.score < scoringMethod.minScore) {
+          if (max.score < scoringMethod.minScore) {
             break rotor2
           }
-          else if (maxSettings.score >= scoringMethod.maxScore) {
-            buildTop3(maxSettings)
-            return top3[2] // we have decoded the ciphertext so only return the plaintext trial
+          else if (max.score >= scoringMethod.maxScore) {
+            return max // we have decoded the ciphertext so only return the plaintext trial
           }
         }
         // when we finish any given rotor set permutation, record the rotor start position configuration with the highest score
-        buildTop3(maxSettings)
-        console.log(maxSettings.rotors[0].type, ':', maxSettings.rotors[0].pos, 
-          maxSettings.rotors[1].type, ':', maxSettings.rotors[1].pos,
-          maxSettings.rotors[2].type, ':', maxSettings.rotors[2].pos, '\n',
-          maxSettings.decoded,
-          '(', maxSettings.score, ')') 
+        if (top3.length < 3) {
+          top3.push(max)
+        } 
+        else {
+          // sort in descending order by score
+          top3.sort((a, b) => a.score - b.score)
+          if (top3[2].score < max.score) {
+            top3[2] = max
+          }
+        }
+        console.log(max.rotors[0].type, ':', max.rotors[0].pos, 
+          max.rotors[1].type, ':', max.rotors[1].pos,
+          max.rotors[2].type, ':', max.rotors[2].pos, '\n',
+          max.decoded,
+          '(', max.score, ')') 
       }
     }
   }
@@ -368,61 +347,52 @@ const findMax = (ciphertext, scoringMethod) => {
 app.use(express.static(path.join(__dirname, 'client/build')))
 
 /* =========== ROUTES =========== */
-// Cracks the enigma code with bigram score method for ciphertext-only attack
-app.post('/enigma/crack/bigram', (req, res) => {
-  const { ciphertext } = req.body
-  console.log(`Cracking method: bigram scoring \nCiphertext: ${ciphertext}.\n`)
-  const top3 = findMax(ciphertext, bigramScore)
-  res.status(200).send(top3)
-})
-
-app.post('/enigma/crack/trigram', (req, res) => {
-  const { ciphertext } = req.body
-  console.log(`Cracking method: trigram scoring \nCiphertext: ${ciphertext}.\n`)
-  const top3 = findMax(ciphertext, trigramScore)
-  res.status(200).send(top3)
-})
-
-app.post('/enigma/crack/quadgram', (req, res) => {
-  const { ciphertext } = req.body
-  console.log(`Cracking method: quadgram scoring \nCiphertext: ${ciphertext}.\n`)
-  const top3 = findMax(ciphertext, quadgramScore)
-  res.status(200).send(top3)
-})
-
-
 // Cracks the enigma code with the IOC method for ciphertext-only attack
-app.post('/enigma/crack/ioc', (req, res) => {
-  const { ciphertext } = req.body
+app.post('/enigma/crack/ioc', sanitizeInput, (req, res) => {
+  const { ciphertext } = req
   console.log(`Cracking method: index of coincidence \nCiphertext: ${ciphertext}.\n`)
   const top3 = findMax(ciphertext, indexOfCoincidence)
   res.status(200).send(top3)
 })
 
-app.post('/enigma/crack/single_ioc', (req, res) => {
-  const { ciphertext } = req.body
-  const ioc = indexOfCoincidence(ciphertext)
-  res.status(200).send({ioc})
-
+// Cracks the enigma code with bigram score method for ciphertext-only attack
+app.post('/enigma/crack/bigram', sanitizeInput, (req, res) => {
+  const { ciphertext } = req
+  console.log(`Cracking method: bigram scoring \nCiphertext: ${ciphertext}\n`)
+  const top3 = findMax(ciphertext, bigramScore)
+  res.status(200).send(top3)
 })
 
-app.post('/enigma/encode/single', (req, res) => {
-  const { rotors, input } = req.body
-  const result = encodeSingle(rotors, input)
-  res.send(result)
+app.post('/enigma/crack/trigram', sanitizeInput, (req, res) => {
+  const { ciphertext } = req
+  console.log(`Cracking method: trigram scoring \nCiphertext: ${ciphertext}.\n`)
+  const top3 = findMax(ciphertext, trigramScore)
+  res.status(200).send(top3)
 })
 
-app.post('/enigma/encode/string', (req, res) => {
-  const { input, rotors} = req.body
-  const trimmedInput = input.replace(/[\s\W\d]+/g, '').toUpperCase()
-  const encoded = encodeString(trimmedInput, rotors)
+app.post('/enigma/crack/quadgram', sanitizeInput, (req, res) => {
+  const { ciphertext } = req
+  console.log(`Cracking method: quadgram scoring \nCiphertext: ${ciphertext}.\n`)
+  const top3 = findMax(ciphertext, quadgramScore)
+  res.status(200).send(top3)
+})
+
+app.post('/enigma/encode/single', sanitizeInput, (req, res) => {
+  const { rotors } = req.body
+  const input = req.ciphertext
+  const {rotatedRotors, outputChar } = encodeSingle(setupRotors(rotors), input)
+  res.send({rotors: rotatedRotors, outputString: outputChar})
+})
+
+app.post('/enigma/encode/string', sanitizeInput, (req, res) => {
+  const { rotors} = req.body
+  const input = req.ciphertext
+  const encoded = encodeString(input, rotors)
   res.send(encoded)
 })
 
+app.get('/enigma/crack/cancel', (req, res) => {
+  // TODO: multithreading necessary to interrupt currently executing cracks
+})
+
 app.listen(port, () => console.log(`Listening on port ${port}...\n`))
-
-
-
-
-// ONTHEOTHERHANDWEDENOUNCEWITHRIGHTEOUSINDIGNATIONANDDISLIKEMENWHOARESOBEGUILEDANDDEMORALIZED  (1:4 3:0 4:2)
-// ZUPENFXQNTZIQQYMHIUVDGQVFZMVZZZAXWCBUAQQUCFRWQAGXAUAKOCZYTAWEAZBLORFXZLKDMTVUDRWGHOFYTYXHXZ

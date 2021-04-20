@@ -1,24 +1,8 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormLabel from '@material-ui/core/FormLabel';
-import FormGroup from '@material-ui/core/FormGroup';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-// import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
+import {Button, Box, Container, CssBaseline, FormControl, FormControlLabel, FormGroup, Grid, LinearProgress, Link, MenuItem, Radio, RadioGroup, Switch, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import MenuItem from '@material-ui/core/MenuItem'
-import Switch from '@material-ui/core/Switch';
 
-import {postEncodeString, postCrack} from './serverMethods.js'
+import {postEncodeString, postCrack, postEncodeSingle} from './serverMethods.js'
 
 function CreatedBy() {
   return (
@@ -63,9 +47,8 @@ const useStyles = makeStyles((theme) => ({
 
 const romanNumerals = ['I', 'II', 'III', 'IV', 'V']
 const numeralToIndex = (romanNumeral) => romanNumerals.indexOf(romanNumeral)
-const indexToNumeral = (index) => romanNumerals[index]
 
-export default function SignIn() {
+export default function EnigmaMachine() {
   const classes = useStyles();
   const [inputText, setInputText] = React.useState('')
   const [outputText, setOutputText] = React.useState('')
@@ -75,13 +58,27 @@ export default function SignIn() {
   const [isCracking, setIsCracking] = React.useState(false)
   const [crackMethod, setCrackMethod] = React.useState(0) // 0: IoC, 1: bigram, 2: trigram, 3: quadgram
   const [crackScore, setCrackScore] = React.useState(0)
+  const [isLiveEncode, setIsLiveEncode] = React.useState(false)
 
   const takenRotors = romanNumerals.filter((numeral) => rotorTypes.includes(numeral))
 
-  const handleEncodeClick = (event) => {
+  // TODO: rotate the rotors properly. Currently it just simulates it, since usually only the 
+  const handleInputKeyDown = (event) => {
+    if (event.key === 'Backspace' && isLiveEncode) {
+      const rotor0 = rotorPos[0] === 0 ? 25 : rotorPos[0] - 1
+      setRotorPos([rotor0, rotorPos[1], rotorPos[2]])
+      setOutputText(outputText.slice(0, -1))
+    }
+  }
+  const handleLiveEncodeClick = () => {
+    setIsLiveEncode(!isLiveEncode)
+    setInputText('')
+    setOutputText('')
+    setRotorPos([0,0,0])
+  }
+  const handleEncodeClick = () => {
     const rotors = rotorTypes.map((type, idx) => ({type, position: rotorPos[idx]}))
     const req = {rotors: [...rotors], input: inputText}
-    console.log(req)
     postEncodeString(req).then((res) => {
       setOutputText(res.outputString)
       setRotorPos(res.rotors.map((rotor) => rotor.position))
@@ -91,21 +88,29 @@ export default function SignIn() {
   const handleCrackClick = (event) => {
     const type = ['ioc', 'bigram', 'trigram', 'quadgram'][crackMethod]
     const req = {type, inputText}
+    setIsCracking(true)
     postCrack(req).then((res) => {
+      if (!isCracking) return
       setOutputText(res.decoded)
       setRotorTypes(res.rotors.map((rotor) => rotor.type))
       setRotorPos(res.rotors.map((rotor) => rotor.pos))
       setCrackScore(res.score)
+      setIsCracking(false)
     })
-  }
-
-  const handleIsCrackingChange = (event) => {
-    setIsCracking(!isCracking)
   }
 
   const handleInputTextChange = (event) => {
     setInputText(event.target.value)
+    if (isLiveEncode && inputText.length < event.target.value.length) {
+      const rotors = rotorTypes.map((type, idx) => ({type, position: rotorPos[idx]}))
+      const req = {rotors: [...rotors], input: event.target.value.slice(-1)}
+      postEncodeSingle(req).then((res) => {
+        setOutputText(outputText.concat(res.outputString))
+        setRotorPos(res.rotors.map((rotor) => rotor.position))
+      })
+    }
   }
+
 
   const handleCrackModeChange = (event) => {
     setCrackMode(!crackMode)
@@ -154,6 +159,7 @@ export default function SignIn() {
             label="Input"
             name="plaintext"
             onChange={handleInputTextChange}
+            onKeyDown={handleInputKeyDown}
             autoFocus
             multiline
             rows={5}
@@ -172,17 +178,19 @@ export default function SignIn() {
             multiline
             rows={5}
           />
+          {isCracking && <LinearProgress color='primary'/>}
           <Button
-            onClick={crackMode ? (isCracking ? handleIsCrackingChange : handleCrackClick) : handleEncodeClick}
+            onClick={crackMode ? handleCrackClick : handleEncodeClick}
+            disabled={inputText.length === 0}
             fullWidth
             variant="contained"
             color={crackMode ? (isCracking ? 'secondary' : 'primary' )  : 'primary'}
             className={classes.submit}
           >
-            {crackMode ? (isCracking ? 'Cancel' : 'Crack') : 'Encode'}
+            {crackMode ? (isCracking ? 'Cracking... This might take a while' : 'Crack') : 'Encode'}
           </Button>
           <Grid container>
-            <Grid item xs>
+            <Grid item>
               <FormGroup>
                 <FormControlLabel 
                   control={<Switch checked={crackMode} onChange={handleCrackModeChange} name='isCrackSwitch' color={crackMode ? 'secondary' : 'primary'}/>}
@@ -190,7 +198,16 @@ export default function SignIn() {
                   />
               </FormGroup>
             </Grid>
-            { !crackMode ? <div /> : 
+            <Grid item>
+              <FormGroup>
+                { !crackMode &&
+                <FormControlLabel
+                  control={<Switch checked={isLiveEncode} onChange={handleLiveEncodeClick} name='isLiveEncodeSwitch' color='primary' />}
+                  label='Live Encoding'
+                />}
+              </FormGroup>
+            </Grid>
+            { crackMode && 
             <FormControl component='fieldset'>
               <RadioGroup row value={crackMethod} onChange={handleCrackMethodChange}>
                 <FormControlLabel value={0} control={<Radio />} label="Index of Coincidence" />
