@@ -1,0 +1,230 @@
+Statistical profiling result from isolate-0x525b030-5086-v8.log, (653359 ticks, 466 unaccounted, 0 excluded).
+
+ [Shared libraries]:
+   ticks  total  nonlib   name
+  520593   79.7%          /usr/bin/node
+   5704    0.9%          /usr/lib/x86_64-linux-gnu/libc-2.31.so
+     40    0.0%          [vdso]
+     12    0.0%          /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28
+
+ [JavaScript]:
+   ticks  total  nonlib   name
+  56120    8.6%   44.2%  LazyCompile: *encodeSingle /home/denny/code/enigma/src/backend/index.js:109:22
+  22993    3.5%   18.1%  LazyCompile: *shiftByAmount /home/denny/code/enigma/src/backend/index.js:63:23
+  17479    2.7%   13.8%  LazyCompile: *rotateAll /home/denny/code/enigma/src/backend/index.js:76:19
+  13494    2.1%   10.6%  LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:125:29
+   3227    0.5%    2.5%  LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+   2580    0.4%    2.0%  LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:206:22
+   2287    0.4%    1.8%  LazyCompile: *indexOfCoincidence /home/denny/code/enigma/src/backend/index.js:122:28
+    679    0.1%    0.5%  LazyCompile: *setupRotors /home/denny/code/enigma/src/backend/index.js:68:21
+    598    0.1%    0.5%  LazyCompile: *encodeString /home/denny/code/enigma/src/backend/index.js:202:22
+     46    0.0%    0.0%  LazyCompile: *rotate /home/denny/code/enigma/src/backend/index.js:88:16
+      4    0.0%    0.0%  LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:125:66
+      3    0.0%    0.0%  LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:72:60
+      3    0.0%    0.0%  LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:127:30
+      2    0.0%    0.0%  LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:70:41
+      1    0.0%    0.0%  RegExp: ^((?:@[^/\\%]+\/)?[^./\\%][^/\\%]*)(\/.*)?$
+      1    0.0%    0.0%  LazyCompile: *inverseTransform /home/denny/code/enigma/src/backend/index.js:104:26
+      1    0.0%    0.0%  LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:85:27
+      1    0.0%    0.0%  LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:77:33
+
+ [C++]:
+   ticks  total  nonlib   name
+   4473    0.7%    3.5%  __pthread_cond_signal
+   1618    0.2%    1.3%  __GI___pthread_mutex_unlock
+    329    0.1%    0.3%  __libc_malloc
+     93    0.0%    0.1%  __GI___pthread_mutex_lock
+     68    0.0%    0.1%  __libc_free
+     66    0.0%    0.1%  __lll_lock_wait
+     56    0.0%    0.0%  do_futex_wait.constprop.0
+     55    0.0%    0.0%  __getpid
+     33    0.0%    0.0%  epoll_pwait
+     32    0.0%    0.0%  std::__detail::_Prime_rehash_policy::_M_next_bkt(unsigned long) const
+     28    0.0%    0.0%  operator new(unsigned long)
+     28    0.0%    0.0%  _IO_default_xsputn
+     16    0.0%    0.0%  __clock_gettime
+     13    0.0%    0.0%  __GI___pthread_mutex_init
+     12    0.0%    0.0%  std::string::_Rep::_S_create(unsigned long, unsigned long, std::allocator<char> const&)
+     12    0.0%    0.0%  char* std::string::_S_construct<char const*>(char const*, char const*, std::allocator<char> const&, std::forward_iterator_tag)
+     11    0.0%    0.0%  __write
+      9    0.0%    0.0%  std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, std::allocator<char> const&)
+      7    0.0%    0.0%  operator delete(void*)
+      7    0.0%    0.0%  __pthread_cond_timedwait
+      7    0.0%    0.0%  __printf_fp
+      5    0.0%    0.0%  __new_sem_post
+      4    0.0%    0.0%  std::__detail::_Prime_rehash_policy::_M_need_rehash(unsigned long, unsigned long, unsigned long) const
+      4    0.0%    0.0%  __pthread_condattr_init
+      4    0.0%    0.0%  __pthread_cond_broadcast
+      4    0.0%    0.0%  __libc_alloca_cutoff
+      4    0.0%    0.0%  _IO_fwrite
+      3    0.0%    0.0%  __GI___pthread_testcancel
+      3    0.0%    0.0%  __GI___pthread_mutex_destroy
+      2    0.0%    0.0%  std::ostream::sentry::sentry(std::ostream&)
+      2    0.0%    0.0%  std::_Rb_tree_insert_and_rebalance(bool, std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::_Rb_tree_node_base&)
+      2    0.0%    0.0%  pthread_condattr_setclock
+      2    0.0%    0.0%  __mprotect
+      1    0.0%    0.0%  std::ostreambuf_iterator<char, std::char_traits<char> > std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::_M_insert_int<long>(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, long) const
+      1    0.0%    0.0%  std::_Rb_tree_rebalance_for_erase(std::_Rb_tree_node_base*, std::_Rb_tree_node_base&)
+      1    0.0%    0.0%  operator new[](unsigned long)
+      1    0.0%    0.0%  operator delete[](void*)
+      1    0.0%    0.0%  brk
+      1    0.0%    0.0%  __pthread_mutex_unlock_usercnt
+      1    0.0%    0.0%  __pthread_condattr_destroy
+      1    0.0%    0.0%  __pthread_cond_init
+      1    0.0%    0.0%  __pthread_cond_destroy
+      1    0.0%    0.0%  __new_sem_wait
+      1    0.0%    0.0%  __mmap
+      1    0.0%    0.0%  _IO_padn
+      1    0.0%    0.0%  _IO_file_xsputn
+
+ [Summary]:
+   ticks  total  nonlib   name
+  119519   18.3%   94.1%  JavaScript
+   7025    1.1%    5.5%  C++
+  13997    2.1%   11.0%  GC
+  526349   80.6%          Shared libraries
+    466    0.1%          Unaccounted
+
+ [C++ entry points]:
+   ticks    cpp   total   name
+      5   29.4%    0.0%  __write
+      2   11.8%    0.0%  std::ostream::sentry::sentry(std::ostream&)
+      2   11.8%    0.0%  std::_Rb_tree_insert_and_rebalance(bool, std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::_Rb_tree_node_base&)
+      2   11.8%    0.0%  _IO_fwrite
+      1    5.9%    0.0%  std::ostreambuf_iterator<char, std::char_traits<char> > std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::_M_insert_int<long>(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, long) const
+      1    5.9%    0.0%  std::__detail::_Prime_rehash_policy::_M_next_bkt(unsigned long) const
+      1    5.9%    0.0%  std::_Rb_tree_rebalance_for_erase(std::_Rb_tree_node_base*, std::_Rb_tree_node_base&)
+      1    5.9%    0.0%  brk
+      1    5.9%    0.0%  __libc_malloc
+      1    5.9%    0.0%  _IO_file_xsputn
+
+ [Bottom up (heavy) profile]:
+  Note: percentage shows a share of a particular caller in the total
+  amount of its parent calls.
+  Callers occupying less than 1.0% are not shown.
+
+   ticks parent  name
+  520593   79.7%  /usr/bin/node
+  320254   61.5%    LazyCompile: *encodeSingle /home/denny/code/enigma/src/backend/index.js:109:22
+  266860   83.3%      LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:206:22
+  265805   99.6%        LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+  265805  100.0%          LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+  265805  100.0%            LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+  53394   16.7%      LazyCompile: *encodeString /home/denny/code/enigma/src/backend/index.js:202:22
+  42306   79.2%        LazyCompile: ~findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+  42306  100.0%          LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+  42306  100.0%            LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+  11088   20.8%        LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+  11088  100.0%          LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+  11088  100.0%            LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+  63892   12.3%    LazyCompile: *rotateAll /home/denny/code/enigma/src/backend/index.js:76:19
+  63887  100.0%      LazyCompile: *encodeSingle /home/denny/code/enigma/src/backend/index.js:109:22
+  53191   83.3%        LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:206:22
+  52986   99.6%          LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+  52986  100.0%            LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+  10696   16.7%        LazyCompile: *encodeString /home/denny/code/enigma/src/backend/index.js:202:22
+   8415   78.7%          LazyCompile: ~findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+   8415  100.0%            LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+   2281   21.3%          LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+   2281  100.0%            LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+  57639   11.1%    /usr/bin/node
+  53909   93.5%      LazyCompile: *encodeSingle /home/denny/code/enigma/src/backend/index.js:109:22
+  44961   83.4%        LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:206:22
+  44791   99.6%          LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+  44791  100.0%            LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+   8948   16.6%        LazyCompile: *encodeString /home/denny/code/enigma/src/backend/index.js:202:22
+   7094   79.3%          LazyCompile: ~findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+   7094  100.0%            LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+   1854   20.7%          LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+   1854  100.0%            LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+   2295    4.0%      LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:125:29
+   2278   99.3%        LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+   2278  100.0%          LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+   2278  100.0%            LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+  22924    4.4%    LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:125:29
+  22821   99.6%      LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+  22821  100.0%        LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+  22821  100.0%          LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+  22821  100.0%            LazyCompile: ~next /home/denny/code/enigma/node_modules/express/lib/router/route.js:114:16
+  15440    3.0%    LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+  15440  100.0%      LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+  15440  100.0%        LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+  15440  100.0%          LazyCompile: ~next /home/denny/code/enigma/node_modules/express/lib/router/route.js:114:16
+  15440  100.0%            LazyCompile: ~dispatch /home/denny/code/enigma/node_modules/express/lib/router/route.js:98:45
+  11364    2.2%    LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:206:22
+  11322   99.6%      LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+  11322  100.0%        LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+  11322  100.0%          LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+  11322  100.0%            LazyCompile: ~next /home/denny/code/enigma/node_modules/express/lib/router/route.js:114:16
+  10213    2.0%    LazyCompile: *shiftByAmount /home/denny/code/enigma/src/backend/index.js:63:23
+  10212  100.0%      LazyCompile: *encodeSingle /home/denny/code/enigma/src/backend/index.js:109:22
+   8543   83.7%        LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:206:22
+   8507   99.6%          LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+   8507  100.0%            LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+   1669   16.3%        LazyCompile: *encodeString /home/denny/code/enigma/src/backend/index.js:202:22
+   1301   78.0%          LazyCompile: ~findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+   1301  100.0%            LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+    368   22.0%          LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+    368  100.0%            LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+
+  56120    8.6%  LazyCompile: *encodeSingle /home/denny/code/enigma/src/backend/index.js:109:22
+  46600   83.0%    LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:206:22
+  46401   99.6%      LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+  46401  100.0%        LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+  46401  100.0%          LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+  46401  100.0%            LazyCompile: ~next /home/denny/code/enigma/node_modules/express/lib/router/route.js:114:16
+   9236   16.5%    LazyCompile: *encodeString /home/denny/code/enigma/src/backend/index.js:202:22
+   7352   79.6%      LazyCompile: ~findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+   7352  100.0%        LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+   7352  100.0%          LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+   7352  100.0%            LazyCompile: ~next /home/denny/code/enigma/node_modules/express/lib/router/route.js:114:16
+   1884   20.4%      LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+   1884  100.0%        LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+   1884  100.0%          LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+   1884  100.0%            LazyCompile: ~next /home/denny/code/enigma/node_modules/express/lib/router/route.js:114:16
+
+  22993    3.5%  LazyCompile: *shiftByAmount /home/denny/code/enigma/src/backend/index.js:63:23
+  21956   95.5%    LazyCompile: *encodeSingle /home/denny/code/enigma/src/backend/index.js:109:22
+  18314   83.4%      LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:206:22
+  18242   99.6%        LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+  18242  100.0%          LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+  18242  100.0%            LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+   3642   16.6%      LazyCompile: *encodeString /home/denny/code/enigma/src/backend/index.js:202:22
+   2869   78.8%        LazyCompile: ~findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+   2869  100.0%          LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+   2869  100.0%            LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+    773   21.2%        LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+    773  100.0%          LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+    773  100.0%            LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+    877    3.8%    LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:206:22
+    874   99.7%      LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+    874  100.0%        LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+    874  100.0%          LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+    874  100.0%            LazyCompile: ~next /home/denny/code/enigma/node_modules/express/lib/router/route.js:114:16
+
+  17479    2.7%  LazyCompile: *rotateAll /home/denny/code/enigma/src/backend/index.js:76:19
+  17152   98.1%    LazyCompile: *encodeSingle /home/denny/code/enigma/src/backend/index.js:109:22
+  14326   83.5%      LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:206:22
+  14270   99.6%        LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+  14270  100.0%          LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+  14270  100.0%            LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+   2826   16.5%      LazyCompile: *encodeString /home/denny/code/enigma/src/backend/index.js:202:22
+   2254   79.8%        LazyCompile: ~findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+   2254  100.0%          LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+   2254  100.0%            LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+    572   20.2%        LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+    572  100.0%          LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+    572  100.0%            LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+    258    1.5%    LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:206:22
+    257   99.6%      LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+    257  100.0%        LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+    257  100.0%          LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+    257  100.0%            LazyCompile: ~next /home/denny/code/enigma/node_modules/express/lib/router/route.js:114:16
+
+  13494    2.1%  LazyCompile: *<anonymous> /home/denny/code/enigma/src/backend/index.js:125:29
+  13418   99.4%    LazyCompile: *findMaxIOC /home/denny/code/enigma/src/backend/index.js:131:20
+  13418  100.0%      LazyCompile: ~<anonymous> /home/denny/code/enigma/src/backend/index.js:220:31
+  13418  100.0%        LazyCompile: ~handle /home/denny/code/enigma/node_modules/express/lib/router/layer.js:86:49
+  13418  100.0%          LazyCompile: ~next /home/denny/code/enigma/node_modules/express/lib/router/route.js:114:16
+  13418  100.0%            LazyCompile: ~dispatch /home/denny/code/enigma/node_modules/express/lib/router/route.js:98:45
+

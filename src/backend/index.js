@@ -1,9 +1,10 @@
 const express = require('express')
 const session = require('express-session')
 const bodyParser = require('body-parser')
+const cors = require('cors')
 const path = require('path')
 
-const port = process.env.PORT || 3001
+const port = 3001
 
 const app = express()
 
@@ -13,10 +14,10 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     expires: 600000,
-    httpOnly: true
   }
 }))
 
+app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
@@ -229,7 +230,6 @@ const encodeString = (input, rotorSettings) => {
     rotors = rotatedRotors
     outputString += outputChar
   })
-
   return {rotors, outputString}
 }
 
@@ -246,18 +246,18 @@ const ngramScore = (ciphertext, ngrams) => {
 
 const bigramScore = {
   method: function(ciphertext){ return ngramScore(ciphertext, bigrams) },
-  minimumScore: 0.17,
+  minScore: 0.17,
   maxScore: 0.5
 }
 const trigramScore = {
   method: function(ciphertext){ return ngramScore(ciphertext, trigrams) },
-  minimumScore: 0,
+  minScore: 0,
   maxScore: 0.08
 }
 
 const quadgramScore = {
   method: function (ciphertext){ return ngramScore(ciphertext, quadgrams) },
-  minimumScore: 0,
+  minScore: 0,
   maxScore: 0.01
 }
 
@@ -270,8 +270,8 @@ const indexOfCoincidence = {
     const result = sums.reduce((acc, curr) => acc + ((curr / N) * (curr - 1) / (N-1)), 0)
     return result
   },
-  minimumScore: 0.06,
-  maxiumumScore: 0.065
+  minScore: 0.06,
+  maxScore: 0.065
 }
 
 const findMax = (ciphertext, scoringMethod) => {
@@ -343,7 +343,7 @@ const findMax = (ciphertext, scoringMethod) => {
             }
           }
           // if this is not a promising configuration, skip to the next rotor set permutation
-          if (maxSettings.score < scoringMethod.minimumScore) {
+          if (maxSettings.score < scoringMethod.minScore) {
             break rotor2
           }
           else if (maxSettings.score >= scoringMethod.maxScore) {
@@ -414,9 +414,9 @@ app.post('/enigma/encode/single', (req, res) => {
 
 app.post('/enigma/encode/string', (req, res) => {
   const { input, rotors} = req.body
-  const encoded = encodeString(input, rotors)
-  
-  res.send({...encoded})
+  const trimmedInput = input.replace(/[\s\W\d]+/g, '').toUpperCase()
+  const encoded = encodeString(trimmedInput, rotors)
+  res.send(encoded)
 })
 
 app.listen(port, () => console.log(`Listening on port ${port}...\n`))
