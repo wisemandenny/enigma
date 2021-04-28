@@ -49,7 +49,10 @@ const postCrack = (req) => {
     }
   })
   .then((res) => res.json())
-  .then((res) => res)
+  .then((res) => {
+    console.log(res)
+    return res
+  })
 }
 
 export { postEncodeString, postCrack, postEncodeSingle, postDeleteSingle }
