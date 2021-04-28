@@ -10,10 +10,24 @@ const postEncodeString = (req) => {
     }
   })
     .then((res) => res.json())
+    .then((res) => res)
 }
 
 const postEncodeSingle = (req) => {
   return fetch(`${prefix}/encode/single`, {
+    method: 'POST',
+    body: JSON.stringify(req),
+    headers: {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json'
+    }
+  })
+  .then((res) => res.json())
+  .then((res) => res)
+}
+
+const postDeleteSingle = (req) => {
+  return fetch(`${prefix}/encode/deleteSingle`, {
     method: 'POST',
     body: JSON.stringify(req),
     headers: {
@@ -38,4 +52,4 @@ const postCrack = (req) => {
   .then((res) => res)
 }
 
-export { postEncodeString, postCrack, postEncodeSingle }
+export { postEncodeString, postCrack, postEncodeSingle, postDeleteSingle }

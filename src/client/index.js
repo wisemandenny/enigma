@@ -1,8 +1,8 @@
 import React from 'react';
-import {Button, Box, Container, CssBaseline, FormControl, FormControlLabel, FormGroup, Grid, LinearProgress, Link, MenuItem, Radio, RadioGroup, Switch, TextField, Typography } from '@material-ui/core';
+import { Button, Box, Container, CssBaseline, FormControl, FormControlLabel, FormGroup, Grid, LinearProgress, Link, MenuItem, Radio, RadioGroup, Switch, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import {postEncodeString, postCrack, postEncodeSingle} from './serverMethods.js'
+import { postEncodeString, postCrack, postEncodeSingle, postDeleteSingle } from './serverMethods.js'
 
 function CreatedBy() {
   return (
@@ -65,9 +65,12 @@ export default function EnigmaMachine() {
   // TODO: rotate the rotors properly. Currently it just simulates it, since usually only the 
   const handleInputKeyDown = (event) => {
     if (event.key === 'Backspace' && isLiveEncode) {
-      const rotor0 = rotorPos[0] === 0 ? 25 : rotorPos[0] - 1
-      setRotorPos([rotor0, rotorPos[1], rotorPos[2]])
-      setOutputText(outputText.slice(0, -1))
+      const rotors = rotorTypes.map((type, idx) => ({type, position: rotorPos[idx]}))
+      postDeleteSingle({rotors: [...rotors]})
+      .then((res) => {
+        setOutputText(outputText.slice(0, -1))
+        setRotorPos(res.rotors.map((rotor) => rotor.position))
+      })
     }
   }
   const handleLiveEncodeClick = () => {
@@ -76,10 +79,12 @@ export default function EnigmaMachine() {
     setOutputText('')
     setRotorPos([0,0,0])
   }
+
   const handleEncodeClick = () => {
     const rotors = rotorTypes.map((type, idx) => ({type, position: rotorPos[idx]}))
     const req = {rotors: [...rotors], input: inputText}
-    postEncodeString(req).then((res) => {
+    postEncodeString(req)
+    .then((res) => {
       setOutputText(res.outputString)
       setRotorPos(res.rotors.map((rotor) => rotor.position))
     })
@@ -100,19 +105,22 @@ export default function EnigmaMachine() {
   }
 
   const handleInputTextChange = (event) => {
-    setInputText(event.target.value)
-    if (isLiveEncode && inputText.length < event.target.value.length) {
-      const rotors = rotorTypes.map((type, idx) => ({type, position: rotorPos[idx]}))
-      const req = {rotors: [...rotors], input: event.target.value.slice(-1)}
-      postEncodeSingle(req).then((res) => {
-        setOutputText(outputText.concat(res.outputString))
-        setRotorPos(res.rotors.map((rotor) => rotor.position))
-      })
+    const invalidCharacters = new RegExp('[\\s\\W\\d]', 'g')
+    if (invalidCharacters.test(event.target.value.slice(-1))) return
+    else {
+      setInputText(event.target.value)
+      if (isLiveEncode && inputText.length < event.target.value.length) {
+        const rotors = rotorTypes.map((type, idx) => ({type, position: rotorPos[idx]}))
+        const req = {rotors: [...rotors], input: event.target.value.slice(-1)}
+        postEncodeSingle(req).then((res) => {
+          setOutputText(outputText.concat(res.outputString))
+          setRotorPos(res.rotors.map((rotor) => rotor.position))
+        })
+      }
     }
   }
 
-
-  const handleCrackModeChange = (event) => {
+  const handleCrackModeChange = () => {
     setCrackMode(!crackMode)
   }
 
@@ -158,6 +166,7 @@ export default function EnigmaMachine() {
             id="plaintext"
             label="Input"
             name="plaintext"
+            value={inputText}
             onChange={handleInputTextChange}
             onKeyDown={handleInputKeyDown}
             autoFocus
