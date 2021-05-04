@@ -10,6 +10,16 @@ By toggling the "Cracking mode" switch, you can attempt to crack Enigma-encrypte
 
 Index of coincidence mode is the most thoroughly tested, and the average crack time for a 50 character message is around 3 minutes, or faster if a decryption with high-likelihood to be plaintext was found.
 
+## How to run locally
+You can run the app by running it in dev mode.
+Simply clone the repo, and `cd` into the directory, and then run the following commands:
+`yarn install`
+`yarn dev` (starts the server)
+then in another terminal window, cd into the directory and run:
+`yarn start`
+
+You can access the UI at localhost:3000.
+
 ## Future plans:
 * Deployment
 * Performance Enhancements
