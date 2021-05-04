@@ -66,7 +66,6 @@ export default function EnigmaMachine() {
 
   let takenRotors = romanNumerals.filter((numeral) => rotorTypes.includes(numeral))
 
-  // TODO: rotate the rotors properly. Currently it just simulates it, since usually only the 
   const handleInputKeyDown = (event) => {
     if (event.key === 'Backspace' && isLiveEncode) {
       const rotors = rotorTypes.map((type, idx) => ({type, position: rotorPos[idx]}))
@@ -165,7 +164,9 @@ export default function EnigmaMachine() {
       <CssBaseline />
       <div className={classes.paper}>
         <Typography component="h1" variant="h4">
-          Enigma Machine
+          <Link color="inherit" href="https://en.wikipedia.org/wiki/Enigma_machine">
+            Enigma Machine
+          </Link>
         </Typography>
         <form className={classes.form} noValidate>
           <TextField

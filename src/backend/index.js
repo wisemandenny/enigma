@@ -59,6 +59,7 @@ app.post('/enigma/crack/trigram', sanitizeInput, (req, res) => {
   const { ciphertext } = req
   const { id } = req.body
   console.log(`Cracking method: trigram scoring \nCiphertext: ${ciphertext}.\n`)
+  console.log(__dirname)
   const trigramChild = cp.fork(__dirname + '/decoderWorker')
   children.set(id, trigramChild)
   trigramChild.on('message', (m) => {

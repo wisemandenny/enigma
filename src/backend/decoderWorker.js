@@ -1,11 +1,11 @@
 const {  alphaToIndex, indexToAlpha, indexToNumeral, transform, inverseTransform, shiftRight } = require('./utils.js')
 const { setupRotors, rotateAll, rotate, encodeSingle, encodeString } = require('./enigma.js')
-const { Alphabet, RotorSettings, Bigrams, Trigrams, Quadgrams } = require('./constants.js')
+const { Alphabet, Numerals, RotorSettings, Bigrams, Trigrams, Quadgrams } = require('./constants.js')
 /* CRYPTANALYSIS METHODS */
 
 const ngramScore = (ciphertext, ngrams) => {
   const counts = ngrams.map((ngram) => {
-    const matches = ciphertext.match(new RegExp(ngram.ngram, 'g'))
+    const matches = ciphertext.match(ngram.ngram)
     return matches ? matches.length * ngram.frequency : 0
   })
   const score = counts.reduce((acc, curr) => acc + curr, 0)
@@ -19,14 +19,14 @@ const bigramScore = {
 }
 const trigramScore = {
   method: function(ciphertext){ return ngramScore(ciphertext, Trigrams) },
-  minScore: 0,
-  maxScore: 0.08
+  minScore: 0.008,
+  maxScore: 0.0739
 }
 
 const quadgramScore = {
   method: function (ciphertext){ return ngramScore(ciphertext, Quadgrams) },
-  minScore: 0,
-  maxScore: 0.01
+  minScore: 0.000745,
+  maxScore: 0.0149
 }
 
 const indexOfCoincidence = {
@@ -45,16 +45,10 @@ const findMax = (ciphertext, scoringMethod) => {
 
   const top3 = []
   const rotors = RotorSettings
-  rotors['I'].position = 0;
-  rotors['II'].position = 0;
-  rotors['III'].position = 0;
-  rotors['IV'].position = 0;
-  rotors['V'].position = 0;
-  rotors['I'].type = 'I';
-  rotors['II'].type = 'II';
-  rotors['III'].type = 'III';
-  rotors['IV'].type = 'IV';
-  rotors['V'].type = 'V';
+  Numerals.map((numeral) => {
+    rotors[numeral].position = 0
+    rotors[numeral].type = numeral
+  })
   for (let i = 0; i < 5; i++) {
     for (let j = 0; j < 5; j++) {
       for (let k = 0; k < 5; k++) {
@@ -93,7 +87,9 @@ const findMax = (ciphertext, scoringMethod) => {
             break rotor2
           }
           else if (max.score >= scoringMethod.maxScore && ciphertext.length > 50) {
-            return max // we have decoded the ciphertext so only return the plaintext trial
+            console.log(`\nFinished rotor set. Best result below:\nConfiguration: ${max.rotors[0].type}-${max.rotors[0].pos}, ${max.rotors[1].type}-${max.rotors[1].pos}, ${max.rotors[2].type}-${max.rotors[2].pos}\nDecoded Text: ${max.decoded}\nScore: (${max.score})`)
+            console.log('\u0007') // make the terminal window ding
+            return max // we have decoded the ciphertext so only return one plaintext
           }
         }
         // when we finish any given rotor set permutation, record the rotor start position configuration with the highest score
@@ -107,7 +103,7 @@ const findMax = (ciphertext, scoringMethod) => {
             top3[2] = max
           }
         }
-        console.log(`Finished rotor set.\nConfiguration: ${max.rotors[0].type}-${max.rotors[0].pos}, ${max.rotors[1].type}-${max.rotors[1].pos}, ${max.rotors[2].type}-${max.rotors[2].pos}\nDecoded Text: ${max.decoded}\nScore: (${max.score})`)
+        console.log(`\nFinished rotor set. Best result below:\nConfiguration: ${max.rotors[0].type}-${max.rotors[0].pos}, ${max.rotors[1].type}-${max.rotors[1].pos}, ${max.rotors[2].type}-${max.rotors[2].pos}\nDecoded Text: ${max.decoded}\nScore: (${max.score})`)
       }
     }
   }
