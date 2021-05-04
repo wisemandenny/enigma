@@ -7,8 +7,8 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const path = require('path')
 const port = process.env.PORT || 3001
-
 const app = express()
+let children = new Map()
 
 app.use(cors())
 app.use(bodyParser.json())
@@ -21,8 +21,6 @@ const sanitizeInput = (req, res, next) => {
   next()
 }
 
-
-
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')))
 
@@ -30,24 +28,28 @@ app.use(express.static(path.join(__dirname, 'client/build')))
 // Cracks the enigma code with the IOC method for ciphertext-only attack
 app.post('/enigma/crack/ioc', sanitizeInput, (req, res) => {
   const { ciphertext } = req
+  const { id } = req.body
   console.log(`Cracking method: index of coincidence \nCiphertext: ${ciphertext}.\n`)
   const iocChild = cp.fork(__dirname + '/decoderWorker')
+  children.set(id, iocChild)
   iocChild.on('message', (m) => {
     iocChild.kill()
+    children.delete(id)
     res.status(200).send(m.top3)
   })
   iocChild.send({ciphertext, type: 'ioc'})
-  // const top3 = findMax(ciphertext, indexOfCoincidence)
-  // res.status(200).send(top3)
 })
 
 // Cracks the enigma code with bigram score method for ciphertext-only attack
 app.post('/enigma/crack/bigram', sanitizeInput, (req, res) => {
   const { ciphertext } = req
+  const { id } = req.body
   console.log(`Cracking method: bigram scoring \nCiphertext: ${ciphertext}\n`)
   const bigramChild = cp.fork(__dirname + '/decoderWorker')
+  children.set(id, bigramChild)
   bigramChild.on('message', (m) => {
     bigramChild.kill()
+    children.delete(id)
     res.status(200).send(m.top3)
   })
   bigramChild.send({ciphertext, type: 'bigram'})
@@ -55,10 +57,13 @@ app.post('/enigma/crack/bigram', sanitizeInput, (req, res) => {
 
 app.post('/enigma/crack/trigram', sanitizeInput, (req, res) => {
   const { ciphertext } = req
+  const { id } = req.body
   console.log(`Cracking method: trigram scoring \nCiphertext: ${ciphertext}.\n`)
   const trigramChild = cp.fork(__dirname + '/decoderWorker')
+  children.set(id, trigramChild)
   trigramChild.on('message', (m) => {
     trigramChild.kill()
+    children.delete(id)
     res.status(200).send(m.top3)
   })
   trigramChild.send({ciphertext, type: 'trigram'})
@@ -66,10 +71,13 @@ app.post('/enigma/crack/trigram', sanitizeInput, (req, res) => {
 
 app.post('/enigma/crack/quadgram', sanitizeInput, (req, res) => {
   const { ciphertext } = req
+  const { id } = req.body
   console.log(`Cracking method: quadgram scoring \nCiphertext: ${ciphertext}.\n`)
   const quadgramChild = cp.fork(__dirname + '/decoderWorker')
+  children.set(id, quadgramChild)
   quadgramChild.on('message', (m) => {
     quadgramChild.kill()
+    children.delete(id)
     res.status(200).send(m.top3)
   })
   quadgramChild.send({ciphertext, type: 'quadgram'})
@@ -95,9 +103,25 @@ app.post('/enigma/encode/string', sanitizeInput, (req, res) => {
   res.send(encoded)
 })
 
-app.get('/enigma/crack/cancel', (req, res) => {
-  // TODO: multithreading necessary to interrupt currently executing cracks
+app.delete('/enigma/crack/cancel/:id', (req, res) => {
+  const { id } = req.params
+  if (!children.has(id)) {
+    res.status(404).send()
+  }
+  else {
+    console.log('Cancelling crack id:', id)
+    const child = children.get(id)
+    child.kill()
+    children.delete(id)
+    res.status(200).send()
+  }
 })
 
 app.listen(port, () => console.log(`Listening on port ${port}...\n`))
+
+
+// FOURSCOREANDSEVENYEARSAGOOURFATHERSBROUGHTFORTHONTHISCONTINENTANEWNATIONCONCEIVEDINLIBERTYANDDEDICATEDTOTHEPROPOSITIONTHATALLMENARECREATEDEQUALNOWWEAREENGAGEDINAGREATCIVILWARTESTINGWHETHERTHATNATIONORANYNATIONSOCONCEIVEDANDSODEDICATEDCANLONGENDUREWEAREMETONAGREATBATTLEFIELDOFTHATWARWEHAVECOMETODEDICATEAPORTIONOFTHATFIELDASAFINALRESTINGPLACEFORTHOSEWHOHEREGAVETHEIRLIVESTHATTHATNATIONMIGHTLIVEITISALTOGETHERFITTINGANDPROPERTHATWESHOULDDOTHIS
+// II V IV 4 2 0
+// LXQVWAXWJBSCFFNCOQMSSTYLYMMBKBRJDCFDMQKNOKPBHMGVXNMNUSPADKIROZULGVCQFVFLDQADDHTQNJMKGZRXGMUDGXYYSPEGKHSRZLGKFBCTFXNVQJBFNVYJVWCPCPCSWUEEBHVCWTEBCIVNHVGZXBWSJZHPRWJXJOLFLZIAVHKAYZRXMTLSFBUACXDGLFRFEIJHJIDQFJVTZJYQBWSRDUSMQIBNTCDQYOKWDNQXOXBZBROKBQZPJMKJTQXVGWMMYEMHQNYFPQHPHPARRTGFKEVSLNMQSYPBDHRYZZLHBFIXUEWWJHSTDPFFYNDJEVFELVATRDGCYZQSQUJPENOQPBYCKQXIWYDZHHQDWDQSAAUWBVVWENQBWSBDLKADWZODEZHMEGVDZOQVOFPLHXQFTDQMYSQMBNDDTUXWSXFUXPTQEEYECBQIJF
+// II V IV 4 19 0
 

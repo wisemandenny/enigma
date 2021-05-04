@@ -85,21 +85,17 @@ const findMax = (ciphertext, scoringMethod) => {
                 ]
                 max.decoded = encoded.outputString
                 max.score = encodedScore
-                console.log('found new max with ', i, j, k, l, m, n, max.decoded)
               }
             }
           }
           // if this is not a promising configuration, skip to the next rotor set permutation
           if (max.score < scoringMethod.minScore) {
-            console.log('breaking because max.score < scoringMethod.minScore')
             break rotor2
           }
           else if (max.score >= scoringMethod.maxScore && ciphertext.length > 50) {
-            console.log('returning max because max.score >= scoringMethod.maxScore')
             return max // we have decoded the ciphertext so only return the plaintext trial
           }
         }
-        console.log('finished rotor set', i, j, k)
         // when we finish any given rotor set permutation, record the rotor start position configuration with the highest score
         if (top3.length < 3) {
           top3.push(max)
@@ -111,11 +107,13 @@ const findMax = (ciphertext, scoringMethod) => {
             top3[2] = max
           }
         }
-        console.log(max.rotors[0].type, ':', max.rotors[0].pos, 
-          max.rotors[1].type, ':', max.rotors[1].pos,
-          max.rotors[2].type, ':', max.rotors[2].pos, '\n',
-          max.decoded,
-          '(', max.score, ')') 
+        // console.log('Finished rotor set\nConfiguration:', 
+        //   max.rotors[0].type, ':', max.rotors[0].pos, 
+        //   max.rotors[1].type, ':', max.rotors[1].pos,
+        //   max.rotors[2].type, ':', max.rotors[2].pos, 
+        //   '\nDecoded Text:', max.decoded,
+        //   '\nScore:', '(', max.score, ')')
+        console.log(`Finished rotor set.\nConfiguration: ${max.rotors[0].type}-${max.rotors[0].pos}, ${max.rotors[1].type}-${max.rotors[1].pos}, ${max.rotors[2].type}-${max.rotors[2].pos}\nDecoded Text: ${max.decoded}\nScore: (${max.score})`)
       }
     }
   }

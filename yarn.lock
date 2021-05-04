@@ -10636,6 +10636,11 @@ shellwords@^0.1.1:
   resolved "https://registry.yarnpkg.com/shellwords/-/shellwords-0.1.1.tgz#d6b9181c1a48d397324c84871efbcfc73fc0654b"
   integrity sha512-vFwSUfQvqybiICwZY5+DAWIPLKsWO31Q91JSKl3UYv+K5c2QRPzn0qzec6QPu1Qc9eHYItiP3NdJqNVqetYAww==
 
+short-unique-id@^4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/short-unique-id/-/short-unique-id-4.2.1.tgz#4ef69b6a1f6ac0e07464de7c232ba1edd4911a1c"
+  integrity sha512-YzUWz6YKG28ZvEfiiFavzYsFaXEk+LvCLaXEPmIYpW9pdf5L6S4zOkCjRV6X/8SPRo3c85GJq38aOQchoAZ8uA==
+
 side-channel@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/side-channel/-/side-channel-1.0.4.tgz#efce5c8fdc104ee751b25c58d4290011fa5ea2cf"

@@ -10,7 +10,7 @@ const postEncodeString = (req) => {
     }
   })
     .then((res) => res.json())
-    .then((res) => res)
+    .then((json) => json)
 }
 
 const postEncodeSingle = (req) => {
@@ -23,7 +23,7 @@ const postEncodeSingle = (req) => {
     }
   })
   .then((res) => res.json())
-  .then((res) => res)
+  .then((json) => json)
 }
 
 const postDeleteSingle = (req) => {
@@ -36,23 +36,28 @@ const postDeleteSingle = (req) => {
     }
   })
   .then((res) => res.json())
-  .then((res) => res)
+  .then((json) => json)
+ 
 }
 
 const postCrack = (req) => {
   return fetch(`${prefix}/crack/${req.type}`, {
     method: 'POST',
-    body: JSON.stringify({ciphertext: req.inputText}),
+    body: JSON.stringify({ciphertext: req.inputText, id: req.id}),
     headers: {
       'Accept': 'application/json, text/plain, */*',
       'Content-Type': 'application/json'
     }
   })
   .then((res) => res.json())
-  .then((res) => {
-    console.log(res)
-    return res
-  })
+  .then((json) => json)
 }
 
-export { postEncodeString, postCrack, postEncodeSingle, postDeleteSingle }
+const cancelCrack = (req) => {
+  return fetch(`${prefix}/crack/cancel/${req.id}`, {
+    method: 'DELETE'
+  })
+  .then(() => {})
+}
+
+export { postEncodeString, postCrack, postEncodeSingle, postDeleteSingle, cancelCrack }

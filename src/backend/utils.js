@@ -1,3 +1,4 @@
+
 /* This file contains any functions needed in both the main server and the decoderWorker */
 const { Alphabet } = require('./constants.js')
 
@@ -28,4 +29,4 @@ const shiftRight = (str, rightShifts) => {
   return [...arr.slice(net), ...arr.slice(0, net)].join('')
 }
 
-module.exports = {alphaToIndex, indexToAlpha, indexToNumeral, transform, inverseTransform, shiftRight}
+module.exports = {alphaToIndex, indexToAlpha, indexToNumeral, transform, inverseTransform, shiftRight }

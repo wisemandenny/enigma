@@ -1,8 +1,9 @@
 import React from 'react';
 import { Button, Box, Container, CssBaseline, FormControl, FormControlLabel, FormGroup, Grid, LinearProgress, Link, MenuItem, Radio, RadioGroup, Switch, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import ShortUniqueId from 'short-unique-id'
 
-import { postEncodeString, postCrack, postEncodeSingle, postDeleteSingle } from './serverMethods.js'
+import { postEncodeString, postCrack, postEncodeSingle, postDeleteSingle, cancelCrack } from './serverMethods.js'
 
 function CreatedBy() {
   return (
@@ -46,7 +47,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const romanNumerals = ['I', 'II', 'III', 'IV', 'V']
-const numeralToIndex = (romanNumeral) => romanNumerals.indexOf(romanNumeral)
+// const numeralToIndex = (romanNumeral) => romanNumerals.indexOf(romanNumeral)
+const uid = new ShortUniqueId()
+
 
 export default function EnigmaMachine() {
   const classes = useStyles();
@@ -59,8 +62,9 @@ export default function EnigmaMachine() {
   const [crackMethod, setCrackMethod] = React.useState(0) // 0: IoC, 1: bigram, 2: trigram, 3: quadgram
   const [crackScore, setCrackScore] = React.useState(0)
   const [isLiveEncode, setIsLiveEncode] = React.useState(false)
+  const [crackId, setCrackId] = React.useState('') // uuid of crack for cancelling
 
-  const takenRotors = romanNumerals.filter((numeral) => rotorTypes.includes(numeral))
+  let takenRotors = romanNumerals.filter((numeral) => rotorTypes.includes(numeral))
 
   // TODO: rotate the rotors properly. Currently it just simulates it, since usually only the 
   const handleInputKeyDown = (event) => {
@@ -92,10 +96,12 @@ export default function EnigmaMachine() {
 
   const handleCrackClick = (event) => {
     const type = ['ioc', 'bigram', 'trigram', 'quadgram'][crackMethod]
-    const req = {type, inputText}
+    const id = uid()
+    const req = { type, inputText, id }
+    setCrackId(id)
     setIsCracking(true)
     postCrack(req).then((res) => {
-      if (!isCracking) return
+      setCrackId('')
       setOutputText(res.decoded)
       setRotorTypes(res.rotors.map((rotor) => rotor.type))
       setRotorPos(res.rotors.map((rotor) => rotor.pos))
@@ -127,14 +133,8 @@ export default function EnigmaMachine() {
   const handleRotorTypeChange = (event) => {
     const current = [...rotorTypes];
     const rotorIdx = parseInt(event.target.name.slice(-1))
-    if (event.target.value !== '') {
-      if (!takenRotors[numeralToIndex(event.target.value)]) {
-        current[rotorIdx] = event.target.value
-        setRotorTypes(current)
-      }
-    }
-    else {
-      current[rotorIdx] = ''
+    if (event.target.value) {
+      current[rotorIdx] = event.target.value ? event.target.value : ''
       setRotorTypes(current)
     }
   }
@@ -149,6 +149,15 @@ export default function EnigmaMachine() {
 
   const handleCrackMethodChange = (event) => {
     setCrackMethod(parseInt(event.target.value))
+  }
+
+  const handleCancelCrackClick = () => {
+    cancelCrack({id: crackId})
+    .then(() => {
+      setIsCracking(false)
+      setCrackId('')
+      setOutputText('Crack cancelled.')
+    })
   }
 
   return (
@@ -189,14 +198,14 @@ export default function EnigmaMachine() {
           />
           {isCracking && <LinearProgress color='primary'/>}
           <Button
-            onClick={crackMode ? handleCrackClick : handleEncodeClick}
+            onClick={crackMode ? isCracking ? handleCancelCrackClick : handleCrackClick : handleEncodeClick}
             disabled={inputText.length === 0}
             fullWidth
             variant="contained"
-            color={crackMode ? (isCracking ? 'secondary' : 'primary' )  : 'primary'}
+            color={crackMode ? isCracking ? 'secondary' : 'primary' : 'primary'}
             className={classes.submit}
           >
-            {crackMode ? (isCracking ? 'Cracking... This might take a while' : 'Crack') : 'Encode'}
+            {crackMode ? isCracking ? 'Cracking... Click to cancel' : 'Crack' : 'Encode'}
           </Button>
           <Grid container>
             <Grid item>
