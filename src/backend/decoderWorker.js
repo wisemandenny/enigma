@@ -107,12 +107,6 @@ const findMax = (ciphertext, scoringMethod) => {
             top3[2] = max
           }
         }
-        // console.log('Finished rotor set\nConfiguration:', 
-        //   max.rotors[0].type, ':', max.rotors[0].pos, 
-        //   max.rotors[1].type, ':', max.rotors[1].pos,
-        //   max.rotors[2].type, ':', max.rotors[2].pos, 
-        //   '\nDecoded Text:', max.decoded,
-        //   '\nScore:', '(', max.score, ')')
         console.log(`Finished rotor set.\nConfiguration: ${max.rotors[0].type}-${max.rotors[0].pos}, ${max.rotors[1].type}-${max.rotors[1].pos}, ${max.rotors[2].type}-${max.rotors[2].pos}\nDecoded Text: ${max.decoded}\nScore: (${max.score})`)
       }
     }
